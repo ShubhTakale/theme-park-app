@@ -27,7 +27,7 @@ pipeline {
             }
             steps {
                 sh 'docker login --username=$DOCKER_HUB_LOGIN_USR --password=$DOCKER_HUB_LOGIN_PSW'
-                sh 'docker push shubham148/theme-park-app:0.1.0-SNAPSHOT'
+                sh './gradlew dockerPush'
             }
         }
     }

@@ -41,3 +41,5 @@ dockerRun {
     clean true
     daemonize false
 }
+
+dockerPush {}
