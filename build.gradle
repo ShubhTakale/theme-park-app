@@ -42,4 +42,6 @@ dockerRun {
     daemonize false
 }
 
-dockerPush {}
+task pushDockerImage(type: Exec) {
+    commandLine "docker", "push", imageName
+}
