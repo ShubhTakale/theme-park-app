@@ -5,6 +5,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.2'
     id 'com.palantir.docker' version '0.31.0'
     id 'com.palantir.docker-run' version '0.31.0'
+    id 'jp.classmethod.aws.reboot.cloudformation' version '0.45'
 }
 version = scmVersion.version
 sourceCompatibility = 8
@@ -27,7 +28,9 @@ test {
     useJUnitPlatform()
 }
 
-String imageName = "shubham148/theme-park-app:$version"
+String dockerHubUsernameProperty = findProperty('dockerHubUsername') ?: 'shubham148'
+String imageName = "${dockerHubUsernameProperty}/theme-park-app:$version"
+
 docker {
     name imageName
     files "build/libs/${bootJar.archiveFileName.get()}"
@@ -44,4 +47,19 @@ dockerRun {
 
 task pushDockerImage(type: Exec) {
     commandLine "docker", "push", imageName
+}
+
+cloudFormation {
+    stackName "$project.name-stack"
+    stackParams([
+            SubnetID: findProperty('subnetId') ?: '',
+            ServiceName: project.name,
+            ServiceVersion: project.version,
+            DockerHubUsername: dockerHubUsernameProperty
+    ])
+    templateFile project.file("ecs.yml")
+}
+
+aws {
+    region = findProperty('region') ?: 'ap-southeast-1'
 }
